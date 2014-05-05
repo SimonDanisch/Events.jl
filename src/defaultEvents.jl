@@ -13,7 +13,7 @@ immutable MouseClicked{ID} <: Event{ID}
     x::Int
     y::Int
 end
-immutable MouseMovingClicked{ID} <: Event{ID}
+immutable MouseDragged{ID} <: Event{ID}
 	start::MouseClicked
     x::Int
     y::Int
@@ -48,4 +48,4 @@ immutable WindowResized{ID} <: Event{ID}
     h::Int
 end
 
-export KeyUp, KeyDown, MouseMoved, MouseMovingClicked, MouseClicked, KeyDownMouseClicked, EnteredWindow, WindowResized, Event
+export KeyUp, KeyDown, MouseMoved, MouseDragged, MouseClicked, KeyDownMouseClicked, EnteredWindow, WindowResized, Event
