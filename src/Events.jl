@@ -1,6 +1,8 @@
 module Events
 
-include("defaultEvents.jl")
+#include("defaultEvents.jl")
+
+abstract Event
 
 immutable EventAction{T}
 	#condition(T, conditionArgs...) -> Bool
@@ -10,6 +12,10 @@ immutable EventAction{T}
 	action::Function
 	actionArgs::Tuple
 end
+registerEventAction(T, condition::Function, action::Function) = registerEventAction(EventAction{T}(condition, (), action, ()))
+registerEventAction(T, condition::Function, conditionArgs::Tuple, action::Function) = registerEventAction(EventAction{T}(condition, conditionArgs, action, ()))
+registerEventAction(T, condition::Function, action::Function, actionArgs::Tuple) = registerEventAction(EventAction{T}(condition, (), action, actionArgs))
+
 
 #Action Event Queues 						#############################################################################
 const EVENT_ACTION_QUEUE 	= Dict{DataType, Dict{Uint64, EventAction}}()
@@ -19,7 +25,6 @@ EVENT_ACTION_QUEUE[Any] 	= Dict{Uint64, EventAction}()
 function clearEventActionQueue()
 	empty!(EVENT_ACTION_QUEUE)
 	EVENT_ACTION_QUEUE[Any] 	= Dict{Uint64, EventAction}()
-
 end
 
 function deleteEventAction{T}(eventAction::EventAction{T})
@@ -29,16 +34,19 @@ function deleteEventAction{T}(eventAction::EventAction{T})
 	eventAction
 end
 
+
 function registerEventAction{T}(eventAction::EventAction{T})
 	id = object_id(eventAction)
 	queue = get(EVENT_ACTION_QUEUE, T, Dict{Uint64, EventAction}())
 	queue[id] = eventAction
 	EVENT_ACTION_QUEUE[T] = queue
+	
 	eventAction
 end
 
 function publishEvent{T <: Event}(event::T)
 	eventQueue = values(get(EVENT_ACTION_QUEUE, T, Dict{Uint64, EventAction}()))
+
 	for action in eventQueue
     	if action.condition(event, action.conditionArgs...)
     		action.action(event, action.actionArgs...)
@@ -63,6 +71,6 @@ function republishEvent{T}(event::T, newID)
 	publishEvent(nameWithoutID{newID}(eventValues...))
 end
 
-export registerEventAction, publishEvent, republishEvent, EventAction, deleteEventAction, clearEventActionQueue
+export registerEventAction, publishEvent, republishEvent, EventAction, deleteEventAction, clearEventActionQueue, Event
 
 end
