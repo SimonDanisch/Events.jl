@@ -15,6 +15,7 @@ end
 registerEventAction(T, condition::Function, action::Function) = registerEventAction(EventAction{T}(condition, (), action, ()))
 registerEventAction(T, condition::Function, conditionArgs::Tuple, action::Function) = registerEventAction(EventAction{T}(condition, conditionArgs, action, ()))
 registerEventAction(T, condition::Function, action::Function, actionArgs::Tuple) = registerEventAction(EventAction{T}(condition, (), action, actionArgs))
+registerEventAction(T, condition::Function, conditionArgs::Tuple, action::Function, actionArgs::Tuple) = registerEventAction(EventAction{T}(condition, conditionArgs, action, actionArgs))
 
 
 #Action Event Queues 						#############################################################################
